@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
 
@@ -14,11 +14,14 @@ const categoryColors = {
   interjections: "#f0abfc",
 };
 
-export default function GrammarChart({ analysis }) {
+export default function GrammarChart({ analysis, selectedCategory, onCategoryClick }) {
+  const [hoveredBar, setHoveredBar] = useState(null);
+  
   if (!analysis) return null;
 
   const chartData = Object.entries(categoryColors).map(([key, color]) => ({
     name: key.charAt(0).toUpperCase() + key.slice(1),
+    key: key,
     count: analysis[key]?.length || 0,
     color,
   })).filter(d => d.count > 0);
@@ -33,6 +36,12 @@ export default function GrammarChart({ analysis }) {
       );
     }
     return null;
+  };
+
+  const handleBarClick = (data) => {
+    if (data && data.key) {
+      onCategoryClick(selectedCategory === data.key ? null : data.key);
+    }
   };
 
   return (
@@ -58,10 +67,25 @@ export default function GrammarChart({ analysis }) {
             axisLine={false}
             tickLine={false}
           />
-          <Tooltip content={<CustomTooltip />} cursor={false} />
-          <Bar dataKey="count" radius={[6, 6, 0, 0]} barSize={32}>
+          <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(139, 92, 246, 0.1)" }} />
+          <Bar 
+            dataKey="count" 
+            radius={[6, 6, 0, 0]} 
+            barSize={32}
+            onClick={handleBarClick}
+            onMouseEnter={(data) => setHoveredBar(data.key)}
+            onMouseLeave={() => setHoveredBar(null)}
+            className="cursor-pointer"
+          >
             {chartData.map((entry, index) => (
-              <Cell key={index} fill={entry.color} fillOpacity={0.8} />
+              <Cell 
+                key={index} 
+                fill={entry.color} 
+                fillOpacity={
+                  selectedCategory === entry.key ? 1 : 
+                  hoveredBar === entry.key ? 0.9 : 0.7
+                }
+              />
             ))}
           </Bar>
         </BarChart>

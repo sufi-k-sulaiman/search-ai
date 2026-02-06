@@ -24,10 +24,17 @@ export default function InteractiveWordCloud({ analysis, selectedCategory, onCat
       }
     });
 
-    return Object.values(allWords)
+    let words = Object.values(allWords);
+    
+    // Filter by selected category if set
+    if (selectedCategory) {
+      words = words.filter(w => w.categories.includes(selectedCategory));
+    }
+
+    return words
       .sort((a, b) => b.count - a.count)
       .slice(0, 100);
-  }, [analysis]);
+  }, [analysis, selectedCategory]);
 
   const maxCount = Math.max(...wordData.map(w => w.count), 1);
 
@@ -130,12 +137,16 @@ export default function InteractiveWordCloud({ analysis, selectedCategory, onCat
                   <p className="text-white/40 text-xs uppercase tracking-wider mb-2">Categories</p>
                   <div className="flex flex-wrap gap-2">
                     {selectedWord.categories.map((cat, i) => (
-                      <span
+                      <button
                         key={i}
-                        className={`px-3 py-1 rounded-lg text-xs font-medium border ${categoryColors[cat]}`}
+                        onClick={() => {
+                          setSelectedWord(null);
+                          onCategorySelect(cat);
+                        }}
+                        className={`px-3 py-1 rounded-lg text-xs font-medium border transition-all hover:scale-105 cursor-pointer ${categoryColors[cat]}`}
                       >
                         {cat}
-                      </span>
+                      </button>
                     ))}
                   </div>
                 </div>
