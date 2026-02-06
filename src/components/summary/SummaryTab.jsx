@@ -7,6 +7,7 @@ export default function SummaryTab({ results, query }) {
   const [summary, setSummary] = useState(null);
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     if (results.length > 0) {
@@ -16,14 +17,17 @@ export default function SummaryTab({ results, query }) {
 
   const generateSummary = async () => {
     setLoading(true);
+    setProgress(0);
     try {
       // Collect all text content
+      setProgress(10);
       const allText = results
         .map(r => `${r.title || ""}\n${r.description || ""}`)
         .join("\n\n")
         .slice(0, 10000);
 
       // Generate summary content
+      setProgress(30);
       const summaryRes = await base44.integrations.Core.InvokeLLM({
         prompt: `Based on the following search results for "${query}", create a comprehensive summary divided into 4 distinct sections. Each section should be 2-3 paragraphs with a clear heading.
 
@@ -49,18 +53,23 @@ Create 4 sections covering different aspects or themes found in the results. Mak
       });
 
       setSummary(summaryRes.sections || []);
+      setProgress(50);
 
       // Generate 4 images based on the sections
       const imagePrompts = summaryRes.sections?.slice(0, 4).map((section, i) => 
         `Professional illustration representing: ${section.heading}. Modern, clean, abstract style with purple and violet color scheme.`
       ) || [];
 
-      const imagePromises = imagePrompts.map(prompt =>
-        base44.integrations.Core.GenerateImage({ prompt })
+      const imagePromises = imagePrompts.map((prompt, i) =>
+        base44.integrations.Core.GenerateImage({ prompt }).then(result => {
+          setProgress(50 + ((i + 1) / imagePrompts.length) * 50);
+          return result;
+        })
       );
 
       const imageResults = await Promise.all(imagePromises);
       setImages(imageResults.map(r => r.url));
+      setProgress(100);
     } catch (err) {
       console.error("Summary generation failed:", err);
     }
@@ -71,7 +80,16 @@ Create 4 sections covering different aspects or themes found in the results. Mak
     return (
       <div className="flex flex-col items-center justify-center py-20">
         <div className="w-12 h-12 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin mb-4" />
-        <p className="text-white/40 text-sm">Generating comprehensive summary...</p>
+        <p className="text-white/40 text-sm mb-4">Generating comprehensive summary...</p>
+        <div className="w-64 h-2 bg-white/5 rounded-full overflow-hidden">
+          <motion.div
+            initial={{ width: 0 }}
+            animate={{ width: `${progress}%` }}
+            transition={{ duration: 0.3 }}
+            className="h-full bg-gradient-to-r from-purple-500 to-violet-500"
+          />
+        </div>
+        <p className="text-purple-400 text-xs font-medium mt-2">{Math.round(progress)}%</p>
       </div>
     );
   }
