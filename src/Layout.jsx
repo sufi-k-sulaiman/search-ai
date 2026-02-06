@@ -43,7 +43,7 @@ export default function Layout({ children, currentPageName }) {
             <div className="w-7 h-7 rounded-lg bg-emerald-500/20 flex items-center justify-center">
               <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
             </div>
-            <span className="text-white/90 font-semibold text-sm tracking-tight">SearchNLP</span>
+            <span className="text-white/90 font-semibold text-sm tracking-tight">Search Ai</span>
           </Link>
           <div className="flex items-center gap-1">
             {navItems.map(item => {
