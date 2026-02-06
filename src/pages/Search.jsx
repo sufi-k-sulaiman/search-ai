@@ -26,6 +26,7 @@ export default function SearchPage() {
   const [currentQuery, setCurrentQuery] = useState("");
   const [biasRatings, setBiasRatings] = useState([]);
   const [activeTab, setActiveTab] = useState("links");
+  const [selectedGrammarCategory, setSelectedGrammarCategory] = useState(null);
 
   const handleSearch = async (query) => {
     setResults([]);

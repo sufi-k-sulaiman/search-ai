@@ -2,7 +2,7 @@ import React, { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 
-export default function InteractiveWordCloud({ analysis }) {
+export default function InteractiveWordCloud({ analysis, selectedCategory, onCategorySelect }) {
   const [selectedWord, setSelectedWord] = useState(null);
   const [hoveredWord, setHoveredWord] = useState(null);
 
