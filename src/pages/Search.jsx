@@ -27,6 +27,7 @@ export default function SearchPage() {
   const [biasRatings, setBiasRatings] = useState([]);
   const [activeTab, setActiveTab] = useState("links");
   const [selectedGrammarCategory, setSelectedGrammarCategory] = useState(null);
+  const [searchError, setSearchError] = useState(null);
 
   const handleSearch = async (query) => {
     setResults([]);
@@ -37,35 +38,38 @@ export default function SearchPage() {
     setCurrentQuery(query);
     setIsSearching(true);
     setBiasRatings([]);
+    setSearchError(null);
 
     const allResults = [];
 
-    // Search using web search and distribute results across engines
-    try {
-      const searchPrompt = `Search the web comprehensively for: "${query}". 
-      Return 50-80 diverse search results with title, link, and description.
-      Include results from various sources and perspectives.`;
+    // Search using web search and distribute results across engines (with retry)
+    let retryCount = 0;
+    let searchSuccess = false;
+    
+    while (retryCount < 2 && !searchSuccess) {
+      try {
+        const searchPrompt = `Search for: "${query}". Return 40-60 search results with title, link, and description.`;
 
-      const res = await base44.integrations.Core.InvokeLLM({
-        prompt: searchPrompt,
-        add_context_from_internet: true,
-        response_json_schema: {
-          type: "object",
-          properties: {
-            results: {
-              type: "array",
-              items: {
-                type: "object",
-                properties: {
-                  title: { type: "string" },
-                  link: { type: "string" },
-                  description: { type: "string" }
+        const res = await base44.integrations.Core.InvokeLLM({
+          prompt: searchPrompt,
+          add_context_from_internet: true,
+          response_json_schema: {
+            type: "object",
+            properties: {
+              results: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    title: { type: "string" },
+                    link: { type: "string" },
+                    description: { type: "string" }
+                  }
                 }
               }
             }
           }
-        }
-      });
+        });
 
       // Distribute results across engines for variety
       const searchResults = res.results || [];
@@ -83,11 +87,17 @@ export default function SearchPage() {
         }
       });
 
-      // Set all results at once
-      setResults(allResults);
-      setCompletedEngines(ENGINES);
-    } catch (err) {
-      console.error("Search failed:", err);
+        // Set all results at once
+        setResults(allResults);
+        setCompletedEngines(ENGINES);
+        searchSuccess = true;
+      } catch (err) {
+        console.error(`Search attempt ${retryCount + 1} failed:`, err);
+        retryCount++;
+        if (retryCount >= 2) {
+          setSearchError("Search failed. Please try again with a different query.");
+        }
+      }
     }
 
     setIsSearching(false);
@@ -417,8 +427,19 @@ Also provide total_words (total unique words analyzed).`,
           )}
         </AnimatePresence>
 
+        {/* Error state */}
+        {searchError && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-12 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-center"
+          >
+            <p className="text-red-400 text-sm">{searchError}</p>
+          </motion.div>
+        )}
+
         {/* Empty state */}
-        {results.length === 0 && !isSearching && (
+        {results.length === 0 && !isSearching && !searchError && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
