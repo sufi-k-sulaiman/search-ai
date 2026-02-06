@@ -209,7 +209,7 @@ Also provide total_words (total unique words analyzed).`,
     <div className="min-h-screen bg-[#0a0a0f] text-white">
       {/* Ambient background */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-500/[0.03] rounded-full blur-3xl" />
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/[0.03] rounded-full blur-3xl" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/[0.03] rounded-full blur-3xl" />
       </div>
 
@@ -220,7 +220,7 @@ Also provide total_words (total unique words analyzed).`,
           animate={{ opacity: 1 }}
           className="text-center mb-12"
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium mb-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-medium mb-6">
             <Sparkles className="w-3 h-3" />
             Multi-Engine Search + NLP
           </div>
@@ -253,7 +253,7 @@ Also provide total_words (total unique words analyzed).`,
                   label="Total Results"
                   value={results.length}
                   icon={FileText}
-                  color="bg-emerald-500"
+                  color="bg-purple-500"
                   delay={0}
                 />
                 <StatCard
@@ -295,7 +295,7 @@ Also provide total_words (total unique words analyzed).`,
                       className="flex items-center justify-center py-16"
                     >
                       <div className="flex flex-col items-center gap-3">
-                        <div className="w-8 h-8 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
+                        <div className="w-8 h-8 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
                         <p className="text-white/40 text-sm">Analyzing grammar with NLP...</p>
                       </div>
                     </motion.div>

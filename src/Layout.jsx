@@ -19,8 +19,8 @@ export default function Layout({ children, currentPageName }) {
           --card-foreground: 0 0% 98%;
           --popover: 0 0% 6%;
           --popover-foreground: 0 0% 98%;
-          --primary: 160 84% 39%;
-          --primary-foreground: 0 0% 0%;
+          --primary: 270 91% 50%;
+          --primary-foreground: 0 0% 100%;
           --secondary: 0 0% 10%;
           --secondary-foreground: 0 0% 98%;
           --muted: 0 0% 10%;
@@ -29,7 +29,7 @@ export default function Layout({ children, currentPageName }) {
           --accent-foreground: 0 0% 98%;
           --border: 0 0% 12%;
           --input: 0 0% 12%;
-          --ring: 160 84% 39%;
+          --ring: 270 91% 50%;
         }
         body {
           background-color: #0a0a0f;
@@ -40,9 +40,11 @@ export default function Layout({ children, currentPageName }) {
       <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-[#0a0a0f]/80 border-b border-white/[0.06]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between h-14">
           <Link to={createPageUrl("Search")} className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-emerald-500/20 flex items-center justify-center">
-              <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-            </div>
+            <img 
+              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/698618bcc713d9c1a4f80de9/22f06fc73_1cPlatformlogo.png" 
+              alt="Search AI Logo" 
+              className="w-7 h-7 rounded-lg"
+            />
             <span className="text-white/90 font-semibold text-sm tracking-tight">Search Ai</span>
           </Link>
           <div className="flex items-center gap-1">

@@ -32,13 +32,13 @@ export default function InteractiveWordCloud({ analysis }) {
   const maxCount = Math.max(...wordData.map(w => w.count), 1);
 
   const categoryColors = {
-    nouns: "bg-emerald-500/30 text-emerald-300 border-emerald-500/40",
-    verbs: "bg-purple-500/30 text-purple-300 border-purple-500/40",
-    adjectives: "bg-amber-500/30 text-amber-300 border-amber-500/40",
-    adverbs: "bg-red-500/30 text-red-300 border-red-500/40",
-    pronouns: "bg-cyan-500/30 text-cyan-300 border-cyan-500/40",
-    prepositions: "bg-pink-500/30 text-pink-300 border-pink-500/40",
-    conjunctions: "bg-indigo-500/30 text-indigo-300 border-indigo-500/40",
+    nouns: "bg-purple-500/30 text-purple-300 border-purple-500/40",
+    verbs: "bg-violet-500/30 text-violet-300 border-violet-500/40",
+    adjectives: "bg-fuchsia-500/30 text-fuchsia-300 border-fuchsia-500/40",
+    adverbs: "bg-pink-500/30 text-pink-300 border-pink-500/40",
+    pronouns: "bg-indigo-500/30 text-indigo-300 border-indigo-500/40",
+    prepositions: "bg-purple-600/30 text-purple-200 border-purple-600/40",
+    conjunctions: "bg-violet-600/30 text-violet-200 border-violet-600/40",
   };
 
   const getWordSize = (count) => {
@@ -119,7 +119,7 @@ export default function InteractiveWordCloud({ analysis }) {
                       <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${(selectedWord.count / maxCount) * 100}%` }}
-                        className="h-full bg-gradient-to-r from-emerald-500 to-cyan-500"
+                        className="h-full bg-gradient-to-r from-purple-500 to-violet-500"
                       />
                     </div>
                     <span className="text-white/60 text-sm font-medium">{selectedWord.count}</span>

@@ -47,7 +47,7 @@ export default function HistoryPage() {
 
         {loadingAnalyses ? (
           <div className="flex items-center justify-center py-20">
-            <div className="w-8 h-8 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
+            <div className="w-8 h-8 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
           </div>
         ) : uniqueQueries.length === 0 ? (
           <motion.div
@@ -75,7 +75,7 @@ export default function HistoryPage() {
                     onClick={() => setSelectedQuery(entry.query)}
                     className={`w-full text-left p-4 rounded-2xl border transition-all duration-300 ${
                       selectedQuery === entry.query
-                        ? "bg-emerald-500/10 border-emerald-500/20"
+                        ? "bg-purple-500/10 border-purple-500/20"
                         : "bg-white/[0.02] border-white/[0.06] hover:bg-white/[0.04]"
                     }`}
                   >
@@ -109,7 +109,7 @@ export default function HistoryPage() {
                           <Trash2 className="w-3.5 h-3.5" />
                         </Button>
                         <ChevronRight className={`w-4 h-4 transition-transform ${
-                          selectedQuery === entry.query ? "text-emerald-400 rotate-90" : "text-white/20"
+                          selectedQuery === entry.query ? "text-purple-400 rotate-90" : "text-white/20"
                         }`} />
                       </div>
                     </div>
@@ -180,7 +180,7 @@ export default function HistoryPage() {
                                 <p className="text-white/70 text-sm font-medium truncate">{r.title}</p>
                               </div>
                               {r.link && (
-                                <a href={r.link} target="_blank" rel="noopener noreferrer" className="text-emerald-400/60 text-xs hover:text-emerald-400 truncate block">
+                                <a href={r.link} target="_blank" rel="noopener noreferrer" className="text-purple-400/60 text-xs hover:text-purple-400 truncate block">
                                   {r.link}
                                 </a>
                               )}

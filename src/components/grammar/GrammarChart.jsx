@@ -3,15 +3,15 @@ import { motion } from "framer-motion";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
 
 const categoryColors = {
-  nouns: "#10b981",
-  pronouns: "#06b6d4",
+  nouns: "#a855f7",
+  pronouns: "#c084fc",
   verbs: "#8b5cf6",
-  adjectives: "#f59e0b",
-  adverbs: "#ef4444",
+  adjectives: "#d946ef",
+  adverbs: "#e879f9",
   prepositions: "#ec4899",
-  conjunctions: "#6366f1",
-  articles: "#14b8a6",
-  interjections: "#f97316",
+  conjunctions: "#a78bfa",
+  articles: "#c4b5fd",
+  interjections: "#f0abfc",
 };
 
 export default function GrammarChart({ analysis }) {
@@ -28,7 +28,7 @@ export default function GrammarChart({ analysis }) {
       return (
         <div className="bg-gray-900/95 backdrop-blur-xl border border-white/10 rounded-xl px-4 py-3 shadow-2xl">
           <p className="text-white/90 text-sm font-medium">{payload[0].payload.name}</p>
-          <p className="text-emerald-400 text-xs mt-1">{payload[0].value} words</p>
+          <p className="text-purple-400 text-xs mt-1">{payload[0].value} words</p>
         </div>
       );
     }

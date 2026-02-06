@@ -2,15 +2,15 @@ import React from "react";
 import { motion } from "framer-motion";
 
 const categoryConfig = {
-  nouns: { label: "Nouns", color: "bg-emerald-500/20 text-emerald-400 border-emerald-500/20" },
-  pronouns: { label: "Pronouns", color: "bg-cyan-500/20 text-cyan-400 border-cyan-500/20" },
-  verbs: { label: "Verbs", color: "bg-purple-500/20 text-purple-400 border-purple-500/20" },
-  adjectives: { label: "Adjectives", color: "bg-amber-500/20 text-amber-400 border-amber-500/20" },
-  adverbs: { label: "Adverbs", color: "bg-red-500/20 text-red-400 border-red-500/20" },
-  prepositions: { label: "Prepositions", color: "bg-pink-500/20 text-pink-400 border-pink-500/20" },
-  conjunctions: { label: "Conjunctions", color: "bg-indigo-500/20 text-indigo-400 border-indigo-500/20" },
-  articles: { label: "Articles", color: "bg-teal-500/20 text-teal-400 border-teal-500/20" },
-  interjections: { label: "Interjections", color: "bg-orange-500/20 text-orange-400 border-orange-500/20" },
+  nouns: { label: "Nouns", color: "bg-purple-500/20 text-purple-400 border-purple-500/20" },
+  pronouns: { label: "Pronouns", color: "bg-violet-500/20 text-violet-400 border-violet-500/20" },
+  verbs: { label: "Verbs", color: "bg-fuchsia-500/20 text-fuchsia-400 border-fuchsia-500/20" },
+  adjectives: { label: "Adjectives", color: "bg-pink-500/20 text-pink-400 border-pink-500/20" },
+  adverbs: { label: "Adverbs", color: "bg-indigo-500/20 text-indigo-400 border-indigo-500/20" },
+  prepositions: { label: "Prepositions", color: "bg-purple-600/20 text-purple-300 border-purple-600/20" },
+  conjunctions: { label: "Conjunctions", color: "bg-violet-600/20 text-violet-300 border-violet-600/20" },
+  articles: { label: "Articles", color: "bg-fuchsia-600/20 text-fuchsia-300 border-fuchsia-600/20" },
+  interjections: { label: "Interjections", color: "bg-pink-600/20 text-pink-300 border-pink-600/20" },
 };
 
 export default function WordCloud({ analysis, selectedCategory, onCategorySelect }) {
