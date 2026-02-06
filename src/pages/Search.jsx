@@ -391,11 +391,19 @@ Also provide total_words (total unique words analyzed).`,
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="rounded-2xl bg-white/[0.02] border border-white/[0.06] p-6">
                     <h3 className="text-white/60 text-xs font-semibold tracking-widest uppercase mb-4">Parts of Speech Distribution</h3>
-                    <GrammarChart analysis={analysis} />
+                    <GrammarChart 
+                      analysis={analysis}
+                      selectedCategory={selectedGrammarCategory}
+                      onCategoryClick={setSelectedGrammarCategory}
+                    />
                   </div>
                   <div className="rounded-2xl bg-white/[0.02] border border-white/[0.06] p-6">
                     <h3 className="text-white/60 text-xs font-semibold tracking-widest uppercase mb-4">Interactive Word Cloud</h3>
-                    <InteractiveWordCloud analysis={analysis} />
+                    <InteractiveWordCloud 
+                      analysis={analysis}
+                      selectedCategory={selectedGrammarCategory}
+                      onCategorySelect={setSelectedGrammarCategory}
+                    />
                   </div>
                 </div>
               )}
