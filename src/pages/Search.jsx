@@ -42,51 +42,53 @@ export default function SearchPage() {
 
     let allResults = [];
 
-    // Fetch results from each engine in parallel (15 results per engine)
-    const searchPromises = ENGINES.map(async (engine, engineIndex) => {
-      try {
-        const res = await base44.integrations.Core.InvokeLLM({
-          prompt: `Search for: "${query}". Return 15 results.`,
-          add_context_from_internet: true,
-          response_json_schema: {
-            type: "object",
-            properties: {
-              results: {
-                type: "array",
-                items: {
-                  type: "object",
-                  properties: {
-                    title: { type: "string" },
-                    link: { type: "string" },
-                    description: { type: "string" }
+    // Fetch results in batches (2 engines at a time) to avoid overwhelming the LLM
+    for (let i = 0; i < ENGINES.length; i += 2) {
+      const batch = ENGINES.slice(i, i + 2);
+      
+      const batchPromises = batch.map(async (engine) => {
+        try {
+          const res = await base44.integrations.Core.InvokeLLM({
+            prompt: `Find 10 results for: "${query}"`,
+            add_context_from_internet: true,
+            response_json_schema: {
+              type: "object",
+              properties: {
+                results: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      title: { type: "string" },
+                      link: { type: "string" },
+                      description: { type: "string" }
+                    }
                   }
                 }
               }
             }
-          }
-        });
+          });
 
-        const engineResults = (res.results || []).map(r => ({
-          ...r,
-          source: engine,
-          query
-        }));
+          const engineResults = (res.results || []).map(r => ({
+            ...r,
+            source: engine,
+            query
+          }));
 
-        // Update UI progressively as each engine completes
-        setResults(prev => [...prev, ...engineResults]);
-        setCompletedEngines(prev => [...prev, engine]);
+          allResults = [...allResults, ...engineResults];
+          setResults([...allResults]);
+          setCompletedEngines(prev => [...prev, engine]);
 
-        return engineResults;
-      } catch (err) {
-        console.error(`${engine} search failed:`, err);
-        setCompletedEngines(prev => [...prev, engine]);
-        return [];
-      }
-    });
+          return engineResults;
+        } catch (err) {
+          console.error(`${engine} search failed:`, err);
+          setCompletedEngines(prev => [...prev, engine]);
+          return [];
+        }
+      });
 
-    // Wait for all engines to complete
-    const engineResults = await Promise.all(searchPromises);
-    allResults = engineResults.flat();
+      await Promise.all(batchPromises);
+    }
 
     if (allResults.length === 0) {
       setSearchError("Search failed. Please try again with a different query.");
