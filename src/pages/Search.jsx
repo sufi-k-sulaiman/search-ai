@@ -49,7 +49,7 @@ export default function SearchPage() {
       const batchPromises = batch.map(async (engine) => {
         try {
           const res = await base44.integrations.Core.InvokeLLM({
-            prompt: `Find 10 results for: "${query}"`,
+            prompt: `Find 15 results for: "${query}"`,
             add_context_from_internet: true,
             response_json_schema: {
               type: "object",
