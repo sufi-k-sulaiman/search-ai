@@ -48,7 +48,7 @@ export default function SearchPage() {
     
     while (retryCount < 2 && !searchSuccess) {
       try {
-        const searchPrompt = `Search for: "${query}". Return 40-60 search results with title, link, and description.`;
+        const searchPrompt = `Find 25 web results for: "${query}"`;
 
         const res = await base44.integrations.Core.InvokeLLM({
           prompt: searchPrompt,
