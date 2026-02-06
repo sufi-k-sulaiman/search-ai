@@ -226,7 +226,7 @@ Also provide total_words (total unique words analyzed).`,
           </div>
           <h1 className="text-4xl sm:text-5xl font-bold tracking-tight mb-3">
             <span className="bg-gradient-to-r from-white via-white/90 to-white/60 bg-clip-text text-transparent">
-              Search Analyzer
+              Search Ai
             </span>
           </h1>
           <p className="text-white/40 text-sm max-w-md mx-auto">
