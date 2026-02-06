@@ -24,6 +24,7 @@ export default function SearchPage() {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [currentQuery, setCurrentQuery] = useState("");
   const [biasRatings, setBiasRatings] = useState([]);
+  const [activeTab, setActiveTab] = useState("links");
 
   const handleSearch = async (query) => {
     setResults([]);
@@ -37,48 +38,54 @@ export default function SearchPage() {
 
     const allResults = [];
 
-    // Use the web search integration to search across multiple engines
-    // We simulate multi-engine by searching with engine-specific prefixes
-    for (const engine of ENGINES) {
-      try {
-        const searchPrompt = `Search the web for: "${query}". 
-        Pretend you are searching on ${engine}. 
-        Return up to 8 search results with title, link, and description.
-        Be thorough and return real, relevant results.`;
+    // Search using web search and distribute results across engines
+    try {
+      const searchPrompt = `Search the web comprehensively for: "${query}". 
+      Return 50-80 diverse search results with title, link, and description.
+      Include results from various sources and perspectives.`;
 
-        const res = await base44.integrations.Core.InvokeLLM({
-          prompt: searchPrompt,
-          add_context_from_internet: true,
-          response_json_schema: {
-            type: "object",
-            properties: {
-              results: {
-                type: "array",
-                items: {
-                  type: "object",
-                  properties: {
-                    title: { type: "string" },
-                    link: { type: "string" },
-                    description: { type: "string" }
-                  }
+      const res = await base44.integrations.Core.InvokeLLM({
+        prompt: searchPrompt,
+        add_context_from_internet: true,
+        response_json_schema: {
+          type: "object",
+          properties: {
+            results: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  title: { type: "string" },
+                  link: { type: "string" },
+                  description: { type: "string" }
                 }
               }
             }
           }
-        });
+        }
+      });
 
-        const engineResults = (res.results || []).map(r => ({
-          ...r,
-          source: engine,
-          query
-        }));
-        allResults.push(...engineResults);
-        setResults(prev => [...prev, ...engineResults]);
-        setCompletedEngines(prev => [...prev, engine]);
-      } catch (err) {
-        console.log(`${engine} search skipped:`, err);
-        setCompletedEngines(prev => [...prev, engine]);
-      }
+      // Distribute results across engines for variety
+      const searchResults = res.results || [];
+      searchResults.forEach((r, idx) => {
+        const engine = ENGINES[idx % ENGINES.length];
+        const result = { ...r, source: engine, query };
+        allResults.push(result);
+        
+        // Update UI progressively
+        if (idx % 8 === 0) {
+          setResults(prev => [...prev, result]);
+          if (!completedEngines.includes(engine)) {
+            setCompletedEngines(prev => [...prev, engine]);
+          }
+        }
+      });
+
+      // Set all results at once
+      setResults(allResults);
+      setCompletedEngines(ENGINES);
+    } catch (err) {
+      console.error("Search failed:", err);
     }
 
     setIsSearching(false);
@@ -279,43 +286,95 @@ Also provide total_words (total unique words analyzed).`,
                 />
               </div>
 
-              {/* NLP Analysis */}
-              {(isAnalyzing || analysis) && (
-                <div className="space-y-6">
-                  <div className="flex items-center gap-3">
-                    <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-                    <h2 className="text-sm font-semibold text-white/50 tracking-widest uppercase">Grammar Analysis</h2>
-                    <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+
+
+              {/* Tabs */}
+              <div className="flex items-center gap-3 mb-6">
+                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                <div className="flex items-center gap-2 bg-white/[0.02] border border-white/[0.06] rounded-xl p-1">
+                  <button
+                    onClick={() => setActiveTab("links")}
+                    className={`px-4 py-2 rounded-lg text-xs font-medium transition-all ${
+                      activeTab === "links"
+                        ? "bg-purple-500/20 text-purple-400"
+                        : "text-white/40 hover:text-white/60"
+                    }`}
+                  >
+                    All Links ({results.length})
+                  </button>
+                  <button
+                    onClick={() => setActiveTab("grammar")}
+                    className={`px-4 py-2 rounded-lg text-xs font-medium transition-all ${
+                      activeTab === "grammar"
+                        ? "bg-purple-500/20 text-purple-400"
+                        : "text-white/40 hover:text-white/60"
+                    }`}
+                  >
+                    Grammar Analysis
+                  </button>
+                  <button
+                    onClick={() => setActiveTab("bias")}
+                    className={`px-4 py-2 rounded-lg text-xs font-medium transition-all ${
+                      activeTab === "bias"
+                        ? "bg-purple-500/20 text-purple-400"
+                        : "text-white/40 hover:text-white/60"
+                    }`}
+                  >
+                    Bias Analysis
+                  </button>
+                </div>
+                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+              </div>
+
+              {/* All Links Tab */}
+              {activeTab === "links" && (
+                <div>
+                  <div className="flex flex-wrap gap-2 mb-6">
+                    <EngineTag
+                      name="All"
+                      count={results.length}
+                      isActive={activeEngine === "all"}
+                      onClick={() => setActiveEngine("all")}
+                    />
+                    {ENGINES.filter(e => engineCounts[e] > 0).map(engine => (
+                      <EngineTag
+                        key={engine}
+                        name={engine}
+                        count={engineCounts[engine]}
+                        isActive={activeEngine === engine}
+                        onClick={() => setActiveEngine(engine)}
+                      />
+                    ))}
                   </div>
 
-                  {isAnalyzing ? (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="flex items-center justify-center py-16"
-                    >
-                      <div className="flex flex-col items-center gap-3">
-                        <div className="w-8 h-8 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
-                        <p className="text-white/40 text-sm">Analyzing grammar with NLP...</p>
-                      </div>
-                    </motion.div>
-                  ) : analysis ? (
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <div className="rounded-2xl bg-white/[0.02] border border-white/[0.06] p-6">
-                        <h3 className="text-white/60 text-xs font-semibold tracking-widest uppercase mb-4">Parts of Speech Distribution</h3>
-                        <GrammarChart analysis={analysis} />
-                      </div>
-                      <div className="rounded-2xl bg-white/[0.02] border border-white/[0.06] p-6">
-                        <h3 className="text-white/60 text-xs font-semibold tracking-widest uppercase mb-4">Interactive Word Cloud</h3>
-                        <InteractiveWordCloud analysis={analysis} />
-                      </div>
-                    </div>
-                  ) : null}
+                  <div className="grid gap-2">
+                    {filteredResults.map((result, i) => (
+                      <ResultCard key={`${result.source}-${i}`} result={result} index={i} />
+                    ))}
+                  </div>
+
+                  {filteredResults.length === 0 && (
+                    <p className="text-center text-white/30 text-sm py-12">No results for this engine</p>
+                  )}
                 </div>
               )}
 
-              {/* Bias Analysis */}
-              {biasRatings.length > 0 && (
+              {/* Grammar Analysis Tab */}
+              {activeTab === "grammar" && analysis && (
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="rounded-2xl bg-white/[0.02] border border-white/[0.06] p-6">
+                    <h3 className="text-white/60 text-xs font-semibold tracking-widest uppercase mb-4">Parts of Speech Distribution</h3>
+                    <GrammarChart analysis={analysis} />
+                  </div>
+                  <div className="rounded-2xl bg-white/[0.02] border border-white/[0.06] p-6">
+                    <h3 className="text-white/60 text-xs font-semibold tracking-widest uppercase mb-4">Interactive Word Cloud</h3>
+                    <InteractiveWordCloud analysis={analysis} />
+                  </div>
+                </div>
+              )}
+
+              {/* Bias Analysis Tab */}
+              {activeTab === "bias" && biasRatings.length > 0 && (
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
                     <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
@@ -337,43 +396,6 @@ Also provide total_words (total unique words analyzed).`,
                   </p>
                 </div>
               )}
-
-              {/* Engine filter tabs */}
-              <div>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-                  <h2 className="text-sm font-semibold text-white/50 tracking-widest uppercase">Search Results</h2>
-                  <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-                </div>
-
-                <div className="flex flex-wrap gap-2 mb-6">
-                  <EngineTag
-                    name="All"
-                    count={results.length}
-                    isActive={activeEngine === "all"}
-                    onClick={() => setActiveEngine("all")}
-                  />
-                  {ENGINES.filter(e => engineCounts[e] > 0).map(engine => (
-                    <EngineTag
-                      key={engine}
-                      name={engine}
-                      count={engineCounts[engine]}
-                      isActive={activeEngine === engine}
-                      onClick={() => setActiveEngine(engine)}
-                    />
-                  ))}
-                </div>
-
-                <div className="grid gap-2">
-                  {filteredResults.map((result, i) => (
-                    <ResultCard key={`${result.source}-${i}`} result={result} index={i} />
-                  ))}
-                </div>
-
-                {filteredResults.length === 0 && (
-                  <p className="text-center text-white/30 text-sm py-12">No results for this engine</p>
-                )}
-              </div>
             </motion.div>
           )}
         </AnimatePresence>
