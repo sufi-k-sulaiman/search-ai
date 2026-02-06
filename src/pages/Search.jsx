@@ -42,14 +42,11 @@ export default function SearchPage() {
 
     let allResults = [];
 
-    // Fetch all search results first
-    let retryCount = 0;
-    let searchSuccess = false;
-    
-    while (retryCount < 2 && !searchSuccess) {
+    // Fetch results from each engine in parallel (15 results per engine)
+    const searchPromises = ENGINES.map(async (engine, engineIndex) => {
       try {
         const res = await base44.integrations.Core.InvokeLLM({
-          prompt: `Find 30 search results for: "${query}"`,
+          prompt: `Search for: "${query}". Return 15 results.`,
           add_context_from_internet: true,
           response_json_schema: {
             type: "object",
@@ -69,29 +66,30 @@ export default function SearchPage() {
           }
         });
 
-        const searchResults = res.results || [];
-        
-        // Distribute results across engines
-        allResults = searchResults.map((r, idx) => ({
+        const engineResults = (res.results || []).map(r => ({
           ...r,
-          source: ENGINES[idx % ENGINES.length],
+          source: engine,
           query
         }));
 
-        searchSuccess = true;
-      } catch (err) {
-        console.error(`Search attempt ${retryCount + 1} failed:`, err);
-        retryCount++;
-        if (retryCount >= 2) {
-          setSearchError("Search failed. Please try again with a different query.");
-        }
-      }
-    }
+        // Update UI progressively as each engine completes
+        setResults(prev => [...prev, ...engineResults]);
+        setCompletedEngines(prev => [...prev, engine]);
 
-    // Update UI with all results
-    if (allResults.length > 0) {
-      setResults(allResults);
-      setCompletedEngines(ENGINES);
+        return engineResults;
+      } catch (err) {
+        console.error(`${engine} search failed:`, err);
+        setCompletedEngines(prev => [...prev, engine]);
+        return [];
+      }
+    });
+
+    // Wait for all engines to complete
+    const engineResults = await Promise.all(searchPromises);
+    allResults = engineResults.flat();
+
+    if (allResults.length === 0) {
+      setSearchError("Search failed. Please try again with a different query.");
     }
 
     setIsSearching(false);
