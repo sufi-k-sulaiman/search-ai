@@ -138,10 +138,13 @@ Provide a brief 1-sentence reasoning.`,
       setBiasRatings(ratings);
     }
 
-    // Save results to database
+    // Save results to database (skip if not authenticated)
     if (allResults.length > 0) {
       try {
-        await base44.entities.SearchResult.bulkCreate(allResults);
+        const isAuth = await base44.auth.isAuthenticated();
+        if (isAuth) {
+          await base44.entities.SearchResult.bulkCreate(allResults);
+        }
       } catch (e) {
         console.log("Failed to save results:", e);
       }
@@ -192,9 +195,12 @@ Also provide total_words (total unique words analyzed).`,
 
         setAnalysis(nlpResult);
 
-        // Save analysis
+        // Save analysis (skip if not authenticated)
         try {
-          await base44.entities.GrammarAnalysis.create({ query, ...nlpResult });
+          const isAuth = await base44.auth.isAuthenticated();
+          if (isAuth) {
+            await base44.entities.GrammarAnalysis.create({ query, ...nlpResult });
+          }
         } catch (e) {
           console.log("Failed to save analysis:", e);
         }
