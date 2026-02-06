@@ -8,7 +8,9 @@ import EngineTag from "../components/search/EngineTag";
 import ResultCard from "../components/search/ResultCard";
 import GrammarChart from "../components/grammar/GrammarChart";
 import WordCloud from "../components/grammar/WordCloud";
+import InteractiveWordCloud from "../components/grammar/InteractiveWordCloud";
 import StatCard from "../components/grammar/StatCard";
+import BiasRating from "../components/bias/BiasRating";
 
 const ENGINES = ["Bing", "Google", "DuckDuckGo", "Brave", "Ecosia", "Qwant", "Ask", "WebCrawler", "Gibiru", "Ekoru"];
 
@@ -21,6 +23,7 @@ export default function SearchPage() {
   const [activeEngine, setActiveEngine] = useState("all");
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [currentQuery, setCurrentQuery] = useState("");
+  const [biasRatings, setBiasRatings] = useState([]);
 
   const handleSearch = async (query) => {
     setResults([]);
@@ -30,6 +33,7 @@ export default function SearchPage() {
     setSelectedCategory(null);
     setCurrentQuery(query);
     setIsSearching(true);
+    setBiasRatings([]);
 
     const allResults = [];
 
@@ -78,6 +82,48 @@ export default function SearchPage() {
     }
 
     setIsSearching(false);
+
+    // Analyze bias for each engine
+    if (allResults.length > 0) {
+      const engineGroups = {};
+      ENGINES.forEach(engine => {
+        engineGroups[engine] = allResults.filter(r => r.source === engine);
+      });
+
+      const biasPromises = Object.entries(engineGroups)
+        .filter(([_, results]) => results.length > 0)
+        .map(async ([engine, results]) => {
+          try {
+            const sampleText = results.slice(0, 5).map(r => `${r.title} ${r.description || ""}`).join("\n");
+            const biasAnalysis = await base44.integrations.Core.InvokeLLM({
+              prompt: `Analyze potential bias in these search results from ${engine} for query "${query}":
+
+${sampleText}
+
+Rate the bias level from 1-10 (1=minimal bias, 10=extreme bias) based on:
+- Political slant
+- Commercial influence
+- Content diversity
+- Source variety
+
+Provide a brief 1-sentence reasoning.`,
+              response_json_schema: {
+                type: "object",
+                properties: {
+                  score: { type: "number" },
+                  reasoning: { type: "string" }
+                }
+              }
+            });
+            return { engine, ...biasAnalysis };
+          } catch {
+            return { engine, score: 5, reasoning: "Unable to analyze bias" };
+          }
+        });
+
+      const ratings = await Promise.all(biasPromises);
+      setBiasRatings(ratings);
+    }
 
     // Save results to database
     if (allResults.length > 0) {
@@ -260,15 +306,35 @@ Also provide total_words (total unique words analyzed).`,
                         <GrammarChart analysis={analysis} />
                       </div>
                       <div className="rounded-2xl bg-white/[0.02] border border-white/[0.06] p-6">
-                        <h3 className="text-white/60 text-xs font-semibold tracking-widest uppercase mb-4">Word Explorer</h3>
-                        <WordCloud
-                          analysis={analysis}
-                          selectedCategory={selectedCategory}
-                          onCategorySelect={setSelectedCategory}
-                        />
+                        <h3 className="text-white/60 text-xs font-semibold tracking-widest uppercase mb-4">Interactive Word Cloud</h3>
+                        <InteractiveWordCloud analysis={analysis} />
                       </div>
                     </div>
                   ) : null}
+                </div>
+              )}
+
+              {/* Bias Analysis */}
+              {biasRatings.length > 0 && (
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                    <h2 className="text-sm font-semibold text-white/50 tracking-widest uppercase">Bias Analysis</h2>
+                    <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                  </div>
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {biasRatings.sort((a, b) => a.score - b.score).map((rating, i) => (
+                      <BiasRating
+                        key={rating.engine}
+                        engine={rating.engine}
+                        score={rating.score}
+                        reasoning={rating.reasoning}
+                      />
+                    ))}
+                  </div>
+                  <p className="text-white/30 text-xs text-center">
+                    Bias ratings are AI-generated estimates based on result diversity, source variety, and content balance
+                  </p>
                 </div>
               )}
 
