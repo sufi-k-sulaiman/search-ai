@@ -11,6 +11,7 @@ import WordCloud from "../components/grammar/WordCloud";
 import InteractiveWordCloud from "../components/grammar/InteractiveWordCloud";
 import StatCard from "../components/grammar/StatCard";
 import BiasRating from "../components/bias/BiasRating";
+import SummaryTab from "../components/summary/SummaryTab";
 
 const ENGINES = ["Bing", "Google", "DuckDuckGo", "Brave", "Ecosia", "Qwant", "Ask", "WebCrawler", "Gibiru", "Ekoru"];
 
@@ -24,7 +25,7 @@ export default function SearchPage() {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [currentQuery, setCurrentQuery] = useState("");
   const [biasRatings, setBiasRatings] = useState([]);
-  const [activeTab, setActiveTab] = useState("links");
+  const [activeTab, setActiveTab] = useState("summary");
 
   const handleSearch = async (query) => {
     setResults([]);
@@ -293,6 +294,16 @@ Also provide total_words (total unique words analyzed).`,
                 <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
                 <div className="flex items-center gap-2 bg-white/[0.02] border border-white/[0.06] rounded-xl p-1">
                   <button
+                    onClick={() => setActiveTab("summary")}
+                    className={`px-4 py-2 rounded-lg text-xs font-medium transition-all ${
+                      activeTab === "summary"
+                        ? "bg-purple-500/20 text-purple-400"
+                        : "text-white/40 hover:text-white/60"
+                    }`}
+                  >
+                    Summary
+                  </button>
+                  <button
                     onClick={() => setActiveTab("links")}
                     className={`px-4 py-2 rounded-lg text-xs font-medium transition-all ${
                       activeTab === "links"
@@ -325,6 +336,11 @@ Also provide total_words (total unique words analyzed).`,
                 </div>
                 <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
               </div>
+
+              {/* Summary Tab */}
+              {activeTab === "summary" && (
+                <SummaryTab results={results} query={currentQuery} />
+              )}
 
               {/* All Links Tab */}
               {activeTab === "links" && (
