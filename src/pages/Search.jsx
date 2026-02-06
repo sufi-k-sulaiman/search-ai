@@ -40,18 +40,16 @@ export default function SearchPage() {
     setBiasRatings([]);
     setSearchError(null);
 
-    const allResults = [];
+    let allResults = [];
 
-    // Search using web search and distribute results across engines (with retry)
+    // Fetch all search results first
     let retryCount = 0;
     let searchSuccess = false;
     
     while (retryCount < 2 && !searchSuccess) {
       try {
-        const searchPrompt = `Find 25 web results for: "${query}"`;
-
         const res = await base44.integrations.Core.InvokeLLM({
-          prompt: searchPrompt,
+          prompt: `Find 30 search results for: "${query}"`,
           add_context_from_internet: true,
           response_json_schema: {
             type: "object",
@@ -71,25 +69,15 @@ export default function SearchPage() {
           }
         });
 
-      // Distribute results across engines for variety
-      const searchResults = res.results || [];
-      searchResults.forEach((r, idx) => {
-        const engine = ENGINES[idx % ENGINES.length];
-        const result = { ...r, source: engine, query };
-        allResults.push(result);
+        const searchResults = res.results || [];
         
-        // Update UI progressively
-        if (idx % 8 === 0) {
-          setResults(prev => [...prev, result]);
-          if (!completedEngines.includes(engine)) {
-            setCompletedEngines(prev => [...prev, engine]);
-          }
-        }
-      });
+        // Distribute results across engines
+        allResults = searchResults.map((r, idx) => ({
+          ...r,
+          source: ENGINES[idx % ENGINES.length],
+          query
+        }));
 
-        // Set all results at once
-        setResults(allResults);
-        setCompletedEngines(ENGINES);
         searchSuccess = true;
       } catch (err) {
         console.error(`Search attempt ${retryCount + 1} failed:`, err);
@@ -98,6 +86,12 @@ export default function SearchPage() {
           setSearchError("Search failed. Please try again with a different query.");
         }
       }
+    }
+
+    // Update UI with all results
+    if (allResults.length > 0) {
+      setResults(allResults);
+      setCompletedEngines(ENGINES);
     }
 
     setIsSearching(false);
