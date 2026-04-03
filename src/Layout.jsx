@@ -70,9 +70,27 @@ export default function Layout({ children, currentPageName }) {
       </nav>
 
       {/* Page content */}
-      <div className="pt-14">
+      <div className="pt-14 pb-20">
         {children}
       </div>
+
+      {/* Footer */}
+      <footer className="fixed bottom-0 left-0 right-0 backdrop-blur-xl bg-[#0a0a0f]/80 border-t border-white/[0.06]">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 text-center">
+          <p className="text-white/40 text-xs">
+            Copyright © 2025 1cPlatform. Developed by{" "}
+            <a
+              href="https://sufikhan.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white/60 hover:text-white/90 transition-colors"
+            >
+              Sufi K Sulaiman
+            </a>
+            . All rights reserved.
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }
