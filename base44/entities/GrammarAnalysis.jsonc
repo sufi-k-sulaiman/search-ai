@@ -1,0 +1,80 @@
+{
+  "name": "GrammarAnalysis",
+  "type": "object",
+  "properties": {
+    "query": {
+      "type": "string",
+      "description": "The search query this analysis belongs to"
+    },
+    "nouns": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of nouns found"
+    },
+    "pronouns": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of pronouns found"
+    },
+    "verbs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of verbs found"
+    },
+    "adjectives": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of adjectives found"
+    },
+    "adverbs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of adverbs found"
+    },
+    "prepositions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of prepositions found"
+    },
+    "conjunctions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of conjunctions found"
+    },
+    "articles": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of articles found"
+    },
+    "interjections": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of interjections found"
+    },
+    "total_words": {
+      "type": "number",
+      "description": "Total word count analyzed"
+    }
+  },
+  "required": [
+    "query"
+  ]
+}

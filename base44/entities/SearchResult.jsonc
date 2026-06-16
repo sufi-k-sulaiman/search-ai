@@ -1,0 +1,30 @@
+{
+  "name": "SearchResult",
+  "type": "object",
+  "properties": {
+    "query": {
+      "type": "string",
+      "description": "The search query used"
+    },
+    "source": {
+      "type": "string",
+      "description": "The search engine source name"
+    },
+    "title": {
+      "type": "string",
+      "description": "Title of the search result"
+    },
+    "link": {
+      "type": "string",
+      "description": "URL of the search result"
+    },
+    "description": {
+      "type": "string",
+      "description": "Description/snippet of the search result"
+    }
+  },
+  "required": [
+    "query",
+    "title"
+  ]
+}

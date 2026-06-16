@@ -92,9 +92,10 @@ export default function Layout({ children, currentPageName }) {
               href="https://sufikhan.com/"
               target="_blank"
               rel="noopener noreferrer"
+              title="Sufi Khan Sulaiman - 20+ years of building scalable Ecommerce solutions"
               className="text-white/60 hover:text-white/90 transition-colors"
             >
-              Sufi K Sulaiman
+              Sufi Khan Sulaiman
             </a>
             . All rights reserved.
           </p>
